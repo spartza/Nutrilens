@@ -1,0 +1,11 @@
+export const LANDING = '/';
+export const LOGIN = '/login';
+export const SIGNUP = '/signup';
+export const FORGOT_PASSWORD = '/forgot-password';
+export const DASHBOARD = '/dashboard';
+export const SCANNER = '/scanner';
+export const PRODUCT_DETAILS = '/product/:barcode';
+export const HISTORY = '/history';
+export const FAVORITES = '/favorites';
+export const COMPARE = '/compare';
+export const PROFILE = '/profile';

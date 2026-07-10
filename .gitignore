@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment files (important for security)
+.env
+.env.local
+.env.*.local
+
+# Production builds
+dist/
+build/
+
+# Editor/System files
+.DS_Store
+.cph/
+.gemini/
+*.log
