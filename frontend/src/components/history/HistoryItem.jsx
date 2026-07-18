@@ -17,12 +17,7 @@ export const HistoryItem = ({ item, onClick, onDelete }) => {
         {productName || 'Unknown Product'}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`text-sm font-black ${getScoreTextColor(healthScore)}`}>
-          {healthScore}
-        </span>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-white font-extrabold text-sm ${getScoreBgColor(healthScore)}`}>
+        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-white font-extrabold text-sm ${getScoreBgColor(grade)}`}>
           {grade || 'C'}
         </span>
       </td>

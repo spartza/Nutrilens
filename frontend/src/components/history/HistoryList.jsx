@@ -20,7 +20,6 @@ export const HistoryList = ({ history = [], onCardClick, onDelete }) => {
           <tr className="border-b border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50/40">
             <th className="px-6 py-3.5">Date</th>
             <th className="px-6 py-3.5">Product</th>
-            <th className="px-6 py-3.5">Score</th>
             <th className="px-6 py-3.5">Grade</th>
             <th className="px-6 py-3.5">Recommendation</th>
             <th className="px-6 py-3.5 text-right">Action</th>

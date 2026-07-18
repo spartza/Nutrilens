@@ -2,18 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { getScoreColorHex } from '../../utils/scoreColor';
 import { getHealthLabel } from '../../constants/healthLabels';
 
-export const HealthScoreCircle = ({ score = 50 }) => {
+export const HealthScoreCircle = ({ grade = 'C' }) => {
+  const g = (grade || 'C').toUpperCase();
+  const scoreMap = { 'A': 100, 'B': 80, 'C': 60, 'D': 40, 'E': 20 };
+  const scoreVal = scoreMap[g] || 60;
+
   const [strokeDash, setStrokeDash] = useState('0, 100');
-  const color = getScoreColorHex(score);
-  const label = getHealthLabel(score);
+  const color = getScoreColorHex(g);
+  const label = getHealthLabel(scoreVal);
 
   useEffect(() => {
     // Triggers smooth circle build-up transition
     const timer = setTimeout(() => {
-      setStrokeDash(`${score}, 100`);
+      setStrokeDash(`${scoreVal}, 100`);
     }, 100);
     return () => clearTimeout(timer);
-  }, [score]);
+  }, [scoreVal]);
 
   return (
     <div className="flex flex-col items-center gap-2 select-none">
@@ -37,17 +41,17 @@ export const HealthScoreCircle = ({ score = 50 }) => {
           />
           <text 
             x="18" 
-            y="21" 
-            className="font-black text-[9px] text-gray-800 text-center"
+            y="22" 
+            className="font-black text-[13px] text-gray-800 text-center"
             fill="currentColor"
             textAnchor="middle"
           >
-            {score}
+            {g}
           </text>
         </svg>
       </div>
       <div className="flex flex-col items-center leading-tight">
-        <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">HEALTH SCORE</span>
+        <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">NUTRI-SCORE</span>
         <span className="text-sm font-bold mt-0.5" style={{ color }}>{label}</span>
       </div>
     </div>

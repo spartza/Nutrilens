@@ -19,6 +19,10 @@ const healthAnalysisSchema = new mongoose.Schema({
     }],
     recommendation: {
         type: String // E.g., "Eat in moderation" or "Healthy choice"
+    },
+    extracted_macros: {
+        type: Map,
+        of: mongoose.Schema.Types.Mixed
     }
 }, { 
     timestamps: true 

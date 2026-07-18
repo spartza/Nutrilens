@@ -140,9 +140,9 @@ export const DashboardPage = () => {
               <div className="flex items-start gap-3">
                 <i className="bx bx-bulb text-amber-500 text-2xl flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-sm text-gray-800 leading-none mb-1">Check the Circular Score</h4>
+                  <h4 className="font-bold text-sm text-gray-800 leading-none mb-1">Check the Nutri-Score</h4>
                   <p className="text-xs text-gray-450 leading-relaxed">
-                    A score above 75 means excellent macros, low sodium/sugar, and a clean label profile.
+                    A grade of A or B means excellent macros, low sodium/sugar, and a clean label profile.
                   </p>
                 </div>
               </div>
@@ -152,7 +152,7 @@ export const DashboardPage = () => {
                 <div>
                   <h4 className="font-bold text-sm text-gray-800 leading-none mb-1">Avoid High-Risk Additives</h4>
                   <p className="text-xs text-gray-450 leading-relaxed">
-                    Synthetic colorings (Yellow 5, Red 40) or preservatives limit health scores to a maximum of 49.
+                    Synthetic colorings (Yellow 5, Red 40) or preservatives will flag the product for avoidance.
                   </p>
                 </div>
               </div>

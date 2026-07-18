@@ -31,11 +31,24 @@ export const useScanner = () => {
     }
   }, []);
 
-  const stopScanning = useCallback(() => {
+  const stopScanning = useCallback((videoElement) => {
     if (codeReaderRef.current) {
       codeReaderRef.current.reset();
       codeReaderRef.current = null;
     }
+    
+    // Explicitly release camera stream tracks to stop camera feed and turn off flashlight/LED indicator
+    if (videoElement && videoElement.srcObject) {
+      try {
+        const stream = videoElement.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        videoElement.srcObject = null;
+      } catch (e) {
+        console.warn("Failed to stop media stream tracks:", e);
+      }
+    }
+    
     setIsScanning(false);
   }, []);
 

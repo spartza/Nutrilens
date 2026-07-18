@@ -9,7 +9,7 @@ export const ProductCard = ({ productName, brand, healthScore, grade, onClick, o
     >
       <div className="flex items-center gap-3.5 min-w-0">
         {/* Nutri-Score badge */}
-        <div className={`w-11 h-11 rounded-xl text-white font-extrabold text-xl flex items-center justify-center shadow-inner flex-shrink-0 ${getScoreBgColor(healthScore)}`}>
+        <div className={`w-11 h-11 rounded-xl text-white font-extrabold text-xl flex items-center justify-center shadow-inner flex-shrink-0 ${getScoreBgColor(grade)}`}>
           {grade || 'C'}
         </div>
         
@@ -21,8 +21,8 @@ export const ProductCard = ({ productName, brand, healthScore, grade, onClick, o
 
       <div className="flex items-center gap-3">
         <div className="flex flex-col items-end flex-shrink-0">
-          <span className={`text-base font-black leading-none ${getScoreTextColor(healthScore)}`}>{healthScore}</span>
-          <span className="text-[9px] text-gray-400 font-bold tracking-wider uppercase mt-1">SCORE</span>
+          <span className={`text-base font-black leading-none ${getScoreTextColor(grade)}`}>{grade || 'C'}</span>
+          <span className="text-[9px] text-gray-400 font-bold tracking-wider uppercase mt-1">GRADE</span>
         </div>
         
         {onDelete && (

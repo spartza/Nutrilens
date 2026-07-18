@@ -9,7 +9,6 @@ import Button from '../../components/ui/Button';
 import ProductHeader from '../../components/product/ProductHeader';
 import HealthScoreCircle from '../../components/health/HealthScoreCircle';
 import AIInsightSummary from '../../components/health/AIInsightSummary';
-import ScoreBreakdownSection from '../../components/health/ScoreBreakdownSection';
 import BenefitsList from '../../components/health/BenefitsList';
 import RisksList from '../../components/health/RisksList';
 import DiabeticBadge from '../../components/health/DiabeticBadge';
@@ -47,7 +46,8 @@ export const ProductDetailPage = () => {
   useEffect(() => {
     const loadProductData = async () => {
       if (isObjectId) {
-        if (history.length === 0) {
+        const found = history.some(item => item._id === barcode);
+        if (!found) {
           await fetchHistory();
         }
       } else {
@@ -55,7 +55,7 @@ export const ProductDetailPage = () => {
       }
     };
     loadProductData();
-  }, [barcode, isObjectId, fetchProduct, fetchHistory]);
+  }, [barcode, isObjectId, history, fetchProduct, fetchHistory]);
 
   // Sync state once history or product loads
   useEffect(() => {
@@ -140,6 +140,14 @@ export const ProductDetailPage = () => {
             <i className="bx bx-left-arrow-alt text-xl mr-1" />
             Back
           </Button>
+          <Button
+            variant="primary"
+            onClick={() => navigate('/scanner')}
+            className="gap-1.5 text-xs py-1.5 px-3.5 rounded-xl font-bold shadow-sm"
+          >
+            <i className="bx bx-plus text-sm" />
+            <span>New Scan</span>
+          </Button>
         </div>
 
         {/* 1. Product Header */}
@@ -154,19 +162,12 @@ export const ProductDetailPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full items-start">
           {/* 2. Health Score Circle */}
           <Card className="flex items-center justify-center py-8">
-            <HealthScoreCircle score={localProduct.healthScore} />
+            <HealthScoreCircle grade={localProduct.grade} />
           </Card>
           
           {/* 3. AI Insight Summary */}
           <AIInsightSummary summary={analysis.summary} />
         </div>
-
-        {/* 4. Score Breakdown Section */}
-        <ScoreBreakdownSection
-          score={localProduct.healthScore}
-          grade={localProduct.grade}
-          hasHighRiskAdditive={hasHighRiskAdditive}
-        />
 
         {/* 5. Benefits and Risks Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full items-start">
@@ -193,7 +194,7 @@ export const ProductDetailPage = () => {
         )}
 
         {/* 8. Nutrition Table */}
-        <NutritionTable macros={localProduct.extracted_macros || localProduct} />
+        <NutritionTable macros={localProduct.aiAnalysisRef?.extracted_macros || localProduct.extracted_macros || {}} />
 
         {/* 9. Ingredients List with highlighting */}
         <IngredientsList 
@@ -212,14 +213,24 @@ export const ProductDetailPage = () => {
             <ShareButton productId={localProduct._id} />
           </div>
           
-          <Button
-            variant="primary"
-            onClick={() => addProductToCompare(localProduct._id)}
-            className="gap-2 text-xs"
-          >
-            <i className="bx bx-git-compare" />
-            <span>Add to Compare</span>
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="primary"
+              onClick={() => navigate('/scanner')}
+              className="gap-2 text-xs py-2 px-3.5 shadow-sm"
+            >
+              <i className="bx bx-plus text-sm" />
+              <span>New Scan</span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => addProductToCompare(localProduct._id)}
+              className="gap-2 text-xs py-2 px-3.5"
+            >
+              <i className="bx bx-git-compare" />
+              <span>Add to Compare</span>
+            </Button>
+          </div>
         </div>
 
       </div>

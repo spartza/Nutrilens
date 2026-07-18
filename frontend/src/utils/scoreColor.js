@@ -1,27 +1,35 @@
-export const getScoreTextColor = (score) => {
-  if (score < 35) return 'text-red-500';
-  if (score < 50) return 'text-orange-400';
-  if (score < 75) return 'text-yellow-500';
-  return 'text-green-500';
+export const getScoreTextColor = (grade) => {
+  const g = (grade || 'C').toUpperCase();
+  if (g === 'A') return 'text-green-500';
+  if (g === 'B') return 'text-green-400';
+  if (g === 'C') return 'text-yellow-500';
+  if (g === 'D') return 'text-orange-400';
+  return 'text-red-500'; // 'E'
 };
 
-export const getScoreBgColor = (score) => {
-  if (score < 35) return 'bg-red-500';
-  if (score < 50) return 'bg-orange-400';
-  if (score < 75) return 'bg-yellow-400';
-  return 'bg-green-500';
+export const getScoreBgColor = (grade) => {
+  const g = (grade || 'C').toUpperCase();
+  if (g === 'A') return 'bg-green-500';
+  if (g === 'B') return 'bg-green-400';
+  if (g === 'C') return 'bg-yellow-400';
+  if (g === 'D') return 'bg-orange-400';
+  return 'bg-red-500'; // 'E'
 };
 
-export const getScoreBorderColor = (score) => {
-  if (score < 35) return 'border-red-500';
-  if (score < 50) return 'border-orange-400';
-  if (score < 75) return 'border-yellow-400';
-  return 'border-green-500';
+export const getScoreBorderColor = (grade) => {
+  const g = (grade || 'C').toUpperCase();
+  if (g === 'A') return 'border-green-500';
+  if (g === 'B') return 'border-green-400';
+  if (g === 'C') return 'border-yellow-400';
+  if (g === 'D') return 'border-orange-400';
+  return 'border-red-500'; // 'E'
 };
 
-export const getScoreColorHex = (score) => {
-  if (score < 35) return '#ef4444';
-  if (score < 50) return '#fb923c';
-  if (score < 75) return '#eab308';
-  return '#22c55e';
+export const getScoreColorHex = (grade) => {
+  const g = (grade || 'C').toUpperCase();
+  if (g === 'A') return '#22c55e';
+  if (g === 'B') return '#4ade80';
+  if (g === 'C') return '#eab308';
+  if (g === 'D') return '#fb923c';
+  return '#ef4444'; // 'E'
 };

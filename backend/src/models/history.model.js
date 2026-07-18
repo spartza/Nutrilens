@@ -14,7 +14,7 @@ const historySchema = new mongoose.Schema(
         },
         healthScore: {
             type: Number,
-            required: true
+            required: false
         },
         grade: {
             type: String,
@@ -33,7 +33,11 @@ const historySchema = new mongoose.Schema(
                     reason: String
                 }
             ],
-            recommendation: String
+            recommendation: String,
+            macros: {
+                type: Map,
+                of: mongoose.Schema.Types.Mixed
+            }
         }
     },
     { 

@@ -6,34 +6,86 @@ const { calculateHealthScore } = require('./scoring.service');
 
 const getProductByBarcode = async (barcode) => {
     // 1. Pehle apne database (MongoDB Atlas) mein check karo
-    let product = await Product.findOne({ barcode });
+    let product = await Product.findOne({ barcode }).populate('aiAnalysisRef');
 
     if (product) {
         console.log(`Product found in local database cache! 🎯`);
-        // Agar cached product mein AI analysis missing hai aur ingredients text available hai
-        if (!product.aiAnalysisRef && product.ingredientsText) {
-            console.log(`AI Analysis missing in cache. Running AI analysis... 🧠`);
+        
+        const hasMacros = product.aiAnalysisRef && 
+            product.aiAnalysisRef.extracted_macros && 
+            (product.aiAnalysisRef.extracted_macros instanceof Map ? 
+                product.aiAnalysisRef.extracted_macros.size > 0 : 
+                Object.keys(product.aiAnalysisRef.extracted_macros).length > 0);
+
+        const macros = product.aiAnalysisRef?.extracted_macros;
+        const isMock = macros && (
+            macros instanceof Map ? 
+                (macros.get('energy_100g') === 150 && macros.get('protein_100g') === 3) : 
+                (macros.energy_100g === 150 && macros.protein_100g === 3)
+        );
+
+        const needsAIAnalysis = !product.aiAnalysisRef || !hasMacros || isMock;
+
+        // Agar cached product mein AI analysis ya macros missing hai aur ingredients text available hai
+        if (needsAIAnalysis && product.ingredientsText) {
+            console.log(`AI Analysis or macros missing/mocked in cache. Running AI analysis... 🧠`);
             try {
                 const aiAnalysisResult = await analyzeIngredientsWithAI(product.name, product.ingredientsText);
-                const scoringResult = calculateHealthScore(aiAnalysisResult);
+                
+                // Fetch external product details to override/merge real macros
+                const externalProduct = await fetchProductFromExternalAPI(barcode);
+                if (externalProduct && externalProduct.macros) {
+                    aiAnalysisResult.extracted_macros = {
+                        ...aiAnalysisResult.extracted_macros,
+                        ...externalProduct.macros
+                    };
+                    product.grade = externalProduct.grade;
+                }
 
-                const healthAnalysis = await HealthAnalysis.create({
-                    productId: product._id,
-                    summary: aiAnalysisResult.summary,
-                    positives: aiAnalysisResult.positives,
-                    negatives: aiAnalysisResult.negatives,
-                    additivesFlagged: aiAnalysisResult.additivesFlagged,
-                    recommendation: aiAnalysisResult.recommendation
-                });
+                const scoringResult = calculateHealthScore(aiAnalysisResult, product.grade);
+
+                let healthAnalysis;
+                if (product.aiAnalysisRef) {
+                    healthAnalysis = await HealthAnalysis.findById(product.aiAnalysisRef._id);
+                }
+
+                if (healthAnalysis) {
+                    healthAnalysis.summary = aiAnalysisResult.summary;
+                    healthAnalysis.positives = aiAnalysisResult.positives;
+                    healthAnalysis.negatives = aiAnalysisResult.negatives;
+                    healthAnalysis.additivesFlagged = aiAnalysisResult.additivesFlagged;
+                    healthAnalysis.recommendation = aiAnalysisResult.recommendation;
+                    healthAnalysis.extracted_macros = aiAnalysisResult.extracted_macros;
+                    await healthAnalysis.save();
+                } else {
+                    healthAnalysis = await HealthAnalysis.create({
+                        productId: product._id,
+                        summary: aiAnalysisResult.summary,
+                        positives: aiAnalysisResult.positives,
+                        negatives: aiAnalysisResult.negatives,
+                        additivesFlagged: aiAnalysisResult.additivesFlagged,
+                        recommendation: aiAnalysisResult.recommendation,
+                        extracted_macros: aiAnalysisResult.extracted_macros
+                    });
+                }
 
                 product.healthScore = scoringResult.final_score;
+                product.grade = scoringResult.nutri_score_grade;
                 product.aiAnalysisRef = healthAnalysis._id;
                 await product.save();
-                console.log(`AI Analysis successfully generated and cached for existing product! 💾`);
+                await product.populate('aiAnalysisRef');
+                console.log(`AI Analysis successfully updated and cached for existing product! 💾`);
             } catch (aiError) {
                 console.error("Failed to run AI analysis for cached product:", aiError.message);
             }
         }
+        
+        // Agar product mein grade missing hai, save a fallback grade 'C'
+        if (!product.grade) {
+            product.grade = 'C';
+            await product.save();
+        }
+        
         return product;
     }
 
@@ -51,7 +103,8 @@ const getProductByBarcode = async (barcode) => {
         name: externalProduct.name,
         brand: externalProduct.brand,
         ingredientsText: externalProduct.ingredientsText,
-        imageUrl: externalProduct.imageUrl
+        imageUrl: externalProduct.imageUrl,
+        grade: externalProduct.grade
     });
 
     // Run AI analysis if ingredientsText is available
@@ -59,7 +112,16 @@ const getProductByBarcode = async (barcode) => {
         try {
             console.log(`Running AI analysis for new product: ${externalProduct.name}... 🧠`);
             const aiAnalysisResult = await analyzeIngredientsWithAI(externalProduct.name, externalProduct.ingredientsText);
-            const scoringResult = calculateHealthScore(aiAnalysisResult);
+            
+            // Merge actual macro values from Open Food Facts API if available
+            if (externalProduct.macros) {
+                aiAnalysisResult.extracted_macros = {
+                    ...aiAnalysisResult.extracted_macros,
+                    ...externalProduct.macros
+                };
+            }
+            
+            const scoringResult = calculateHealthScore(aiAnalysisResult, externalProduct.grade);
 
             const healthAnalysis = await HealthAnalysis.create({
                 productId: product._id,
@@ -67,10 +129,12 @@ const getProductByBarcode = async (barcode) => {
                 positives: aiAnalysisResult.positives,
                 negatives: aiAnalysisResult.negatives,
                 additivesFlagged: aiAnalysisResult.additivesFlagged,
-                recommendation: aiAnalysisResult.recommendation
+                recommendation: aiAnalysisResult.recommendation,
+                extracted_macros: aiAnalysisResult.extracted_macros
             });
 
             product.healthScore = scoringResult.final_score;
+            product.grade = scoringResult.nutri_score_grade;
             product.aiAnalysisRef = healthAnalysis._id;
         } catch (aiError) {
             console.error("Failed to run AI analysis for new product:", aiError.message);
@@ -78,6 +142,9 @@ const getProductByBarcode = async (barcode) => {
     }
 
     await product.save();
+    if (product.aiAnalysisRef) {
+        await product.populate('aiAnalysisRef');
+    }
     console.log(`New product fetched and cached in database! 💾`);
     
     return product;

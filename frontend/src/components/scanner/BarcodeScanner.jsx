@@ -7,16 +7,17 @@ export const BarcodeScanner = ({ onScanSuccess }) => {
   const { startScanning, stopScanning, isScanning, error } = useScanner();
 
   useEffect(() => {
-    if (videoRef.current) {
-      startScanning(videoRef.current, (barcode) => {
+    const video = videoRef.current;
+    if (video) {
+      startScanning(video, (barcode) => {
         // Stop scanning immediately and trigger success callback
-        stopScanning();
+        stopScanning(video);
         onScanSuccess(barcode);
       });
     }
 
     return () => {
-      stopScanning();
+      stopScanning(video);
     };
   }, [startScanning, stopScanning, onScanSuccess]);
 

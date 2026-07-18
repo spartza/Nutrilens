@@ -1,7 +1,7 @@
 export const useScoreBreakdown = () => {
   // Generates breakdown weights mirroring backend scoring.service.js
-  const getBreakdown = (score, grade, hasHighRiskAdditive) => {
-    let nutritionalVal = 60;
+  const getBreakdown = (score, grade, additives = [], isOrganic = false) => {
+    let nutritionalVal = 50;
     switch (grade) {
       case 'A': nutritionalVal = 95; break;
       case 'B': nutritionalVal = 80; break;
@@ -9,6 +9,28 @@ export const useScoreBreakdown = () => {
       case 'D': nutritionalVal = 40; break;
       case 'E': nutritionalVal = 20; break;
     }
+
+    let additivesList = Array.isArray(additives) ? additives : [];
+    let hasHighRisk = typeof additives === 'boolean' ? additives : false;
+    
+    let additivesScore = 30;
+    if (hasHighRisk) {
+      additivesScore = 0;
+    } else {
+      additivesList.forEach(additive => {
+        const risk = (additive.riskLevel || '').toUpperCase();
+        if (risk === 'HIGH') {
+          hasHighRisk = true;
+          additivesScore = 0;
+        } else if (risk === 'MODERATE') {
+          additivesScore -= 10;
+        }
+      });
+    }
+    additivesScore = Math.max(0, additivesScore);
+    const additivesVal = hasHighRisk ? 0 : Math.round((additivesScore / 30) * 100);
+
+    const organicVal = isOrganic ? 100 : 0;
 
     return [
       {
@@ -19,15 +41,19 @@ export const useScoreBreakdown = () => {
       },
       {
         name: 'Additives Safety',
-        score: hasHighRiskAdditive ? 0 : 100,
+        score: additivesVal,
         weight: 30,
-        description: hasHighRiskAdditive ? 'Contains high-risk additives' : 'Safe additive profile'
+        description: hasHighRisk 
+          ? 'Contains high-risk additives' 
+          : additivesVal < 100 
+            ? 'Contains moderate-risk additives' 
+            : 'Safe additive profile'
       },
       {
         name: 'Organic Bonus',
-        score: score > 90 ? 100 : 0,
+        score: organicVal,
         weight: 10,
-        description: score > 90 ? 'Organic product certification' : 'Standard product'
+        description: isOrganic ? 'Organic product certification' : 'Standard product'
       }
     ];
   };

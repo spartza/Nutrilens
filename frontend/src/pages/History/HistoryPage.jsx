@@ -27,9 +27,9 @@ export const HistoryPage = () => {
     if (filter.sort === 'latest') {
       result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (filter.sort === 'highest') {
-      result.sort((a, b) => b.healthScore - a.healthScore);
+      result.sort((a, b) => (a.grade || 'C').localeCompare(b.grade || 'C'));
     } else if (filter.sort === 'lowest') {
-      result.sort((a, b) => a.healthScore - b.healthScore);
+      result.sort((a, b) => (b.grade || 'C').localeCompare(a.grade || 'C'));
     }
 
     return result;

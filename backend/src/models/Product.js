@@ -22,6 +22,10 @@ const productSchema = new mongoose.Schema({
         type: Number, // 1 se 100 tak ka score jo AI generate karega
         default: null
     },
+    grade: {
+        type: String,
+        default: null
+    },
     imageUrl: {
         type: String
     },

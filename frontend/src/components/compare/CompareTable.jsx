@@ -1,6 +1,5 @@
 import React from 'react';
 import { getScoreTextColor } from '../../utils/scoreColor';
-import CompareScoreBar from './CompareScoreBar';
 
 export const CompareTable = ({ products = [] }) => {
   if (!products || products.length < 2) return null;
@@ -25,13 +24,6 @@ export const CompareTable = ({ products = [] }) => {
 
   return (
     <div className="flex flex-col gap-6 w-full select-none">
-      {/* Dynamic Relative Score Bar */}
-      <CompareScoreBar 
-        scoreA={productA.healthScore} 
-        scoreB={productB.healthScore} 
-        nameA={productA.name || productA.productName} 
-        nameB={productB.name || productB.productName} 
-      />
 
       <div className="overflow-x-auto w-full border border-gray-150 rounded-3xl bg-white shadow-sm">
         <table className="w-full text-left border-collapse min-w-[500px]">
@@ -47,15 +39,6 @@ export const CompareTable = ({ products = [] }) => {
               <td className="px-6 py-4 text-sm font-semibold text-gray-500">Brand / Label</td>
               <td className="px-6 py-4 text-center font-bold text-gray-800">{productA.brand || 'N/A'}</td>
               <td className="px-6 py-4 text-center font-bold text-gray-800">{productB.brand || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td className="px-6 py-4 text-sm font-semibold text-gray-500">Health Score</td>
-              <td className={`px-6 py-4 text-center text-lg font-black ${getScoreTextColor(productA.healthScore)}`}>
-                {productA.healthScore}
-              </td>
-              <td className={`px-6 py-4 text-center text-lg font-black ${getScoreTextColor(productB.healthScore)}`}>
-                {productB.healthScore}
-              </td>
             </tr>
             <tr>
               <td className="px-6 py-4 text-sm font-semibold text-gray-500">Nutri-Score Grade</td>

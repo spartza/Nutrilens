@@ -34,14 +34,26 @@ const compareProducts = async (req, res) => {
                 positives: h.analysis?.positives,
                 negatives: h.analysis?.negatives,
                 additivesFlagged: h.analysis?.additives || [],
-                recommendation: h.analysis?.recommendation
+                recommendation: h.analysis?.recommendation,
+                extracted_macros: h.analysis?.macros || {}
             },
             extracted_macros: h.analysis?.macros || {}
         }));
 
         const productsMap = {};
         productsFromDB.forEach(p => {
-            productsMap[p._id.toString()] = p;
+            const pObj = p.toObject();
+            if (!pObj.grade && pObj.healthScore !== null) {
+                const getGradeFromScore = (score) => {
+                    if (score >= 80) return 'A';
+                    if (score >= 65) return 'B';
+                    if (score >= 50) return 'C';
+                    if (score >= 35) return 'D';
+                    return 'E';
+                };
+                pObj.grade = getGradeFromScore(pObj.healthScore);
+            }
+            productsMap[pObj._id.toString()] = pObj;
         });
         mappedHistory.forEach(h => {
             productsMap[h._id.toString()] = h;
@@ -103,14 +115,26 @@ const getComparisonHistory = async (req, res) => {
                     positives: h.analysis?.positives,
                     negatives: h.analysis?.negatives,
                     additivesFlagged: h.analysis?.additives || [],
-                    recommendation: h.analysis?.recommendation
+                    recommendation: h.analysis?.recommendation,
+                    extracted_macros: h.analysis?.macros || {}
                 },
                 extracted_macros: h.analysis?.macros || {}
             }));
 
             const productsMap = {};
             productsFromDB.forEach(p => {
-                productsMap[p._id.toString()] = p;
+                const pObj = p.toObject();
+                if (!pObj.grade && pObj.healthScore !== null) {
+                    const getGradeFromScore = (score) => {
+                        if (score >= 80) return 'A';
+                        if (score >= 65) return 'B';
+                        if (score >= 50) return 'C';
+                        if (score >= 35) return 'D';
+                        return 'E';
+                    };
+                    pObj.grade = getGradeFromScore(pObj.healthScore);
+                }
+                productsMap[pObj._id.toString()] = pObj;
             });
             mappedHistory.forEach(h => {
                 productsMap[h._id.toString()] = h;

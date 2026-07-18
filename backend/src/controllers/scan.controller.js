@@ -30,7 +30,8 @@ const processProductScan = asyncHandler(async (req, res) => {
             positives: aiAnalysisResult.positives,
             negatives: aiAnalysisResult.negatives,
             additives: aiAnalysisResult.additivesFlagged,
-            recommendation: aiAnalysisResult.recommendation
+            recommendation: aiAnalysisResult.recommendation,
+            macros: aiAnalysisResult.extracted_macros
         }
     });
 
@@ -46,7 +47,8 @@ const processProductScan = asyncHandler(async (req, res) => {
                 positives: aiAnalysisResult.positives,
                 negatives: aiAnalysisResult.negatives,
                 additives: aiAnalysisResult.additivesFlagged,
-                recommendation: aiAnalysisResult.recommendation
+                recommendation: aiAnalysisResult.recommendation,
+                macros: aiAnalysisResult.extracted_macros
             }
         }, "Product scanned and saved to history successfully! 🚀")
     );

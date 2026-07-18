@@ -1,9 +1,9 @@
 import React from 'react';
 import { useScoreBreakdown } from '../../hooks/useScoreBreakdown';
 
-export const ScoreBreakdownSection = ({ score, grade, hasHighRiskAdditive }) => {
+export const ScoreBreakdownSection = ({ score, grade, additives, isOrganic }) => {
   const { getBreakdown } = useScoreBreakdown();
-  const breakdown = getBreakdown(score, grade, hasHighRiskAdditive);
+  const breakdown = getBreakdown(score, grade, additives, isOrganic);
 
   return (
     <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm select-none w-full">
